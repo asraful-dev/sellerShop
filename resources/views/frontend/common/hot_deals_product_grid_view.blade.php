@@ -1,3 +1,40 @@
+ <style>
+   .countdown-wrapper {
+        position: absolute;
+        bottom:10px;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+    .countdown-bar {
+        background-color: #444;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    .countdown-time {
+        display: flex;
+        justify-content: space-between;
+    }
+    .countdown-segment {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 5px;
+    }
+    .count-value {
+        font-size: 18px;
+        font-weight: bold;
+        color: #e02252;
+        margin-bottom: 2px;
+    }
+    .count-label {
+        font-size: 10px;
+        color: #fff;
+    }
+         
+</style>
+        
 @foreach($hot_deals_product as $product)
     <div class="ps-product">
         <div class="ps-product__thumbnail">
@@ -20,14 +57,35 @@
             @if ($product->discount_price > 0)
                 @if ($product->discount_type == 1)
                     <div class="ps-product__badge">৳{{ $product->discount_price }} off</div>
-                    <div class="ps-product__badge2" id="countdown_{{ $product->id }}"></div>
+                    <div class="countdown-wrapper" id="countdown_{{ $product->id }}">
+                     <div class="countdown-bar">
+                         <div class="countdown-time">
+                             <div class="countdown-segment">
+                                 <span id="days_{{ $product->id }}" class="count-value">00</span>
+                                 <span class="count-label">দিন</span>
+                             </div>
+                             <div class="countdown-segment">
+                                 <span id="hours_{{ $product->id }}" class="count-value">00</span>
+                                 <span class="count-label">ঘন্টা</span>
+                             </div>
+                             <div class="countdown-segment">
+                                 <span id="minutes_{{ $product->id }}" class="count-value">00</span>
+                                 <span class="count-label">মিনিট</span>
+                             </div>
+                             <div class="countdown-segment">
+                                 <span id="seconds_{{ $product->id }}" class="count-value">00</span>
+                                 <span class="count-label">সেকেন্ড</span>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
                 @elseif($product->discount_type == 2)
                     <div class="ps-product__badge">{{ $product->discount_price }}% off</div>
                 @endif
             @endif
             <ul class="ps-product__actions">
                 @if ($product->is_varient == 1)
-                    <!-- start varient product add to cart direct -->
+     
                     <li>
                         <input type="hidden" id="pfrom" value="direct">
                         <input type="hidden" id="product_product_id" value="{{ $product->id }}" min="1">
@@ -35,7 +93,7 @@
                         <a onclick="addToCartDirect({{ $product->id }})" data-placement="top" title="Add To Cart"
                             style="cursor:pointer;"><i class="icon-bag2"></i></a>
                     </li>
-                    <!-- end varient product add to cart direct -->
+                   
                     <li>
                         <a href="#" id="{{ $product->id }}" onclick="productView(this.id)" data-placement="top"
                             title="Quick View" data-toggle="modal" data-target="#product-quickview"><i
@@ -43,7 +101,7 @@
                         </a>
                     </li>
                 @else
-                    <!-- start not varient product add to cart direct -->
+                
                     <input type="hidden" id="pfrom" value="direct">
                     <input type="hidden" id="product_product_id" value="{{ $product->id }}" min="1">
                     <input type="hidden" id="{{ $product->id }}-product_pname" value="{{ $product->name_en }}">
@@ -52,12 +110,7 @@
                         <a onclick="addToCartDirect({{ $product->id }})" data-placement="top" title="Add To Cart"
                             style="cursor:pointer;"><i class="icon-bag2"></i></a>
                     </li>
-                    <!-- end not varient product add to cart direct -->
-
-                    <!--<li>-->
-                    <!--    <a  onclick="addToCartDirect({{ $product->id }})" data-placement="top" title="Quick View" style="cursor:pointer;"><i class="icon-eye"></i>-->
-                    <!--    </a>-->
-                    <!--</li>-->
+                   
                 @endif
                 <li><a href="#" data-toggle="tooltip" data-placement="top" title="Add to Whishlist"><i
                             class="icon-heart"></i></a></li>
@@ -114,44 +167,7 @@
                         ->avg('rating');
                 @endphp
 
-                {{-- <div class="ps-product__rating">
-                <select class="ps-rating" data-read-only="true">
-                    @if ($avarage == 0)
-                    @elseif($avarage == 1 || $avarage < 2)
-                        <option value="1">1</option>
-                        <option value="2">1</option>
-                        <option value="2">1</option>
-                        <option value="2">1</option>
-                        <option value="2">1</option>
-                    @elseif($avarage == 2 || $avarage < 3)
-                        <option value="1">1</option>
-                        <option value="1">1</option>
-                        <option value="2">1</option>
-                        <option value="2">1</option>
-                        <option value="2">1</option>
-                    @elseif($avarage == 3 || $avarage < 4)
-                        <option value="1">1</option>
-                        <option value="1">1</option>
-                        <option value="1">1</option>
-                        <option value="2">1</option>
-                        <option value="2">1</option>
-                    @elseif($avarage == 4 || $avarage < 5)
-                        <option value="1">1</option>
-                        <option value="1">1</option>
-                        <option value="1">1</option>
-                        <option value="1">1</option>
-                        <option value="2">1</option>
-                    @elseif($avarage == 5 || $avarage < 5)
-                        <option value="1">1</option>
-                        <option value="1">1</option>
-                        <option value="1">1</option>
-                        <option value="1">1</option>
-                        <option value="1">1</option>
-                    @endif
-                </select>
-                <span>({{ count($reviewcount)}})</span>
-                <!-- <span>01</span> -->
-            </div> --}}
+             
 
                 @if ($product->is_varient == 1)
                     <!-- start varient product add to cart direct -->
@@ -211,7 +227,6 @@
                     </div>
                 @endif
 
-                {{-- <p class="ps-product__title">Point: {{ $product->product_point ?? '0'  }}</p> --}}
             </div>
             <div class="ps-product__content hover">
                 <a class="ps-product__title" href="{{ route('product.details', $product->slug) }}">
@@ -238,41 +253,7 @@
                 @endif
 
                 <div class="ps-product__rating">
-                    {{-- <select class="ps-rating" data-read-only="true">
-                        @if ($avarage == 0)
-                        @elseif($avarage == 1 || $avarage < 2)
-                            <option value="1">1</option>
-                            <option value="2">1</option>
-                            <option value="2">1</option>
-                            <option value="2">1</option>
-                            <option value="2">1</option>
-                        @elseif($avarage == 2 || $avarage < 3)
-                            <option value="1">1</option>
-                            <option value="1">1</option>
-                            <option value="2">1</option>
-                            <option value="2">1</option>
-                            <option value="2">1</option>
-                        @elseif($avarage == 3 || $avarage < 4)
-                            <option value="1">1</option>
-                            <option value="1">1</option>
-                            <option value="1">1</option>
-                            <option value="2">1</option>
-                            <option value="2">1</option>
-                        @elseif($avarage == 4 || $avarage < 5)
-                            <option value="1">1</option>
-                            <option value="1">1</option>
-                            <option value="1">1</option>
-                            <option value="1">1</option>
-                            <option value="2">1</option>
-                        @elseif($avarage == 5 || $avarage < 5)
-                            <option value="1">1</option>
-                            <option value="1">1</option>
-                            <option value="1">1</option>
-                            <option value="1">1</option>
-                            <option value="1">1</option>
-                        @endif
-                    </select><span>({{ count($reviewcount) }})</span> --}}
-                    <!-- <span>01</span> -->
+               
                 </div>
 
                 @if ($product->is_varient == 1)
@@ -335,31 +316,37 @@
                 @endif
             </div>
         </div>
-        <script>
-            var hotDealEndDate_{{ $product->id }} = {{ $product->hot_deal_end_date ?: 0 }} * 1000; // Multiply by 1000 to convert from seconds to milliseconds
-            var countdownInterval_{{ $product->id }} = setInterval(updateCountdown_{{ $product->id }}, 1000);
-    
-            function updateCountdown_{{ $product->id }}() {
-                var now = new Date().getTime();
-                var difference = hotDealEndDate_{{ $product->id }} - now;
-    
-                if (difference <= 0) {
-                    clearInterval(countdownInterval_{{ $product->id }});
-                    $('#countdown_{{ $product->id }}').html('');
-                    // Additional actions when countdown ends for this product
-                    return;
-                }
-    
-                var days = Math.floor(difference / (1000 * 60 * 60 * 24));
-                var hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                var minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-                var seconds = Math.floor((difference % (1000 * 60)) / 1000);
-    
-                document.getElementById("countdown_{{ $product->id }}").innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
-            }
-        </script>
     </div>
-    
-
-    {{-- <h5 class="text-danger">No Product Found</h5> --}}
 @endforeach
+
+<script>
+    @foreach($hot_deals_product as $product)
+    var hotDealEndDate_{{ $product->id }} = {{ $product->hot_deal_end_date ?: 0 }} * 1000; // সেকেন্ড থেকে মিলিসেকেন্ডে রূপান্তর
+    var countdownInterval_{{ $product->id }} = setInterval(updateCountdown_{{ $product->id }}, 1000); // প্রতি সেকেন্ডে আপডেট হবে
+
+    function updateCountdown_{{ $product->id }}() {
+        var now = new Date().getTime(); // বর্তমান সময়
+        var difference = hotDealEndDate_{{ $product->id }} - now; // প্রোডাক্টের শেষ সময়ের সাথে তুলনা
+
+        // যদি সময় শেষ হয়ে যায়
+        if (difference <= 0) {
+            clearInterval(countdownInterval_{{ $product->id }}); // Countdown বন্ধ করা
+            document.getElementById("countdown_{{ $product->id }}").innerHTML = '<div class="countdown-bar"><div class="countdown-label">সময় শেষ!</div></div>';
+            return;
+        }
+
+        // দিন, ঘন্টা, মিনিট এবং সেকেন্ড গণনা করা
+        var days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+        // Countdown এর মান আপডেট করা
+        document.getElementById("days_{{ $product->id }}").innerText = days;
+        document.getElementById("hours_{{ $product->id }}").innerText = hours;
+        document.getElementById("minutes_{{ $product->id }}").innerText = minutes;
+        document.getElementById("seconds_{{ $product->id }}").innerText = seconds;
+    }
+    @endforeach
+</script>
+
